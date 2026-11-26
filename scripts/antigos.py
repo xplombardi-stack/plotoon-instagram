@@ -6,7 +6,10 @@
 Nunca apaga posts publicados por esta fila (posts/*/publicado.json) nem nada publicado depois da data de corte.
 """
 import json
+import random
 import sys
+import time
+from datetime import timedelta
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -60,8 +63,14 @@ def apagar(ig):
         print("Apagar não autorizado: nada apagado.")
         return
     corte = datetime.fromisoformat(aut["antes_de"])
-    por_rodada = int(aut.get("por_dia", 20))
+    por_dia = int(aut.get("por_dia", 20))
     feitos = json.loads(APAGADOS.read_text(encoding="utf-8")) if APAGADOS.exists() else []
+    agora = datetime.now(timezone.utc)
+    nas_24h = sum(1 for f in feitos if datetime.fromisoformat(f["apagado_em"]) > agora - timedelta(hours=24))
+    por_rodada = min(int(aut.get("por_rodada", 5)), max(0, por_dia - nas_24h))
+    if not por_rodada:
+        print(f"Limite do dia atingido ({nas_24h} apagados nas últimas 24h).")
+        return
     ja = {f["id"] for f in feitos}
     fila = ids_da_fila()
     lista = json.loads(LISTA.read_text(encoding="utf-8"))["posts"]
@@ -72,6 +81,8 @@ def apagar(ig):
     )
     n = 0
     for p in candidatos[:por_rodada]:
+        if n:
+            time.sleep(random.randint(60, 120))  # ritmo de gente, pra não parecer robô
         try:
             graph(f"/{p['id']}", {}, "DELETE")
         except RuntimeError as e:
