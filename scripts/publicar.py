@@ -19,7 +19,7 @@ import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 
-GRAPH = "https://graph.facebook.com/v23.0"
+GRAPH = "https://graph.facebook.com/v25.0"
 PAGINA = os.environ.get("IG_PAGE_ID", "1507688999086201")  # Página do Facebook "Plotoon"
 RAIZ = Path(__file__).resolve().parent.parent
 POSTS = RAIZ / "posts"
