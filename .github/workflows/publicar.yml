@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
     inputs:
       acao:
-        description: "publicar ou verificar"
+        description: "publicar, verificar ou testar"
         default: "publicar"
 
 permissions:
@@ -31,8 +31,8 @@ jobs:
         env:
           IG_TOKEN: ${{ secrets.IG_TOKEN }}
         run: |
-          if [ "${{ github.event.inputs.acao }}" = "verificar" ]; then
-            python scripts/publicar.py verificar
+          if [ "${{ github.event.inputs.acao }}" = "verificar" ] || [ "${{ github.event.inputs.acao }}" = "testar" ]; then
+            python scripts/publicar.py "${{ github.event.inputs.acao }}"
           else
             python scripts/publicar.py
           fi

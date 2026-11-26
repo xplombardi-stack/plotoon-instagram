@@ -117,6 +117,14 @@ def main():
         c = graph(f"/{ig}", {"fields": "username,followers_count,media_count"})
         print(f"Chave OK: @{c.get('username')} · {c.get('media_count')} posts · {c.get('followers_count')} seguidores")
         return
+    if len(sys.argv) > 1 and sys.argv[1] == "testar":
+        # prepara cada imagem na Meta sem publicar (o rascunho some sozinho em 24h)
+        for pasta in sorted(p for p in POSTS.iterdir() if p.is_dir()):
+            img = sorted(pasta.glob("*.jpg"))[0]
+            c = graph(f"/{ig}/media", {"image_url": url_publica(img), "caption": "teste"}, "POST")["id"]
+            esperar_pronto(c)
+            print(f"  {pasta.name}: imagem aceita pela Meta (nada publicado)")
+        return
     agora = datetime.now(timezone.utc)
     feitos = 0
     for pasta in sorted(p for p in POSTS.iterdir() if p.is_dir()):
